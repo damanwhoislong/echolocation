@@ -20,7 +20,7 @@ try:
     roll = math.atan2(2.0*(quat.y*quat.z + quat.w*quat.x), quat.w*quat.w - quat.x*quat.x - quat.y*quat.y + quat.z*quat.z);
     pitch = math.asin(-2.0 * (quat.x * quat.z - quat.w * quat.y))
     yaw = math.atan2(2.0 * (quat.x * quat.y + quat.w * quat.z), quat.w * quat.w + quat.x * quat.x - quat.y * quat.y - quat.z * quat.z)
-    print("Yaw:", yaw*180/3.141592654, "Pitch:", pitch*180/3.141592654, "Roll:", roll*180/3.141592654)
+    print("Yaw:", yaw*180/3.14159265358979323846264338327950288, "Pitch:", pitch*180/3.14159265358979323846264338327950288, "Roll:", roll*180/3.14159265358979323846264338327950288)
     time.sleep(0.5)
 finally:
   hub.shutdown()  # !! crucial

@@ -11,13 +11,13 @@ def move_player(buttons, p_spd):
     direction = [0, 0]  # y, x
 
     # redoing dis shit, num[0] = x movement, num[1] = y movement
-    if buttons[pygame.K_w]:
+    if buttons[pygame.K_w]:  # go up (decreases X)
         direction[1] = - p_spd
-    elif buttons[pygame.K_s]:
+    elif buttons[pygame.K_s]:  # go down (increases X)
         direction[1] = p_spd
-    if buttons[pygame.K_d]:
+    if buttons[pygame.K_d]:  # go right (increases Y)
         direction[0] = p_spd
-    elif buttons[pygame.K_a]:
+    elif buttons[pygame.K_a]:  # go left (decreases Y)
         direction[0] = - p_spd
 
     # move da player
