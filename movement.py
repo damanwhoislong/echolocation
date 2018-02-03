@@ -4,12 +4,21 @@ import time
 import sys
 import random
 import math
+import qwer
 
 
-def move_player(buttons, p_spd):
+def move_player(buttons, p_spd, ang):
     global posX, posY, stepDelay
     direction = [0, 0]  # y, x
 
+    velX = math.cos(ang * 1)
+    velY = math.sin(ang * 1)
+
+    posX += velX
+    posY += velY
+
+    stepDelay += -1
+    '''
     # redoing dis shit, num[0] = x movement, num[1] = y movement
     if buttons[pygame.K_w]:  # go up (decreases X)
         direction[1] = - p_spd
@@ -27,9 +36,8 @@ def move_player(buttons, p_spd):
     else:
         posX += direction[1]
         posY += direction[0]
+    '''
 
-    if direction[0] != 0 or direction[1] != 0:
-        stepDelay += -1
 
 # set up pygame
 pygame.mixer.pre_init(22050, -16, 4, 512)
@@ -67,9 +75,12 @@ print(wallList)
 moveSpeed = 1.0 / 60  # grid tiles per second / 60 frames per second
 
 while True:
+    # get da angle
+    angle = qwer.get_angle()
+
     # moving
     pressed = pygame.key.get_pressed()
-    move_player(pressed, moveSpeed)
+    move_player(pressed, moveSpeed, angle)
     posToGrid = [int(round(posX)), int(round(posY))]
 
     print(posToGrid)
