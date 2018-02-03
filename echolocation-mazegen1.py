@@ -1,7 +1,7 @@
 import random
 
 size = 10
-grid = []  # w = wall, p = path, s = start, f = finish
+grid = []
 wall = "X"
 path = " "
 start = "S"
