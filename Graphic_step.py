@@ -1,3 +1,6 @@
+# Graphic_step.py
+# Purpose: Provides movement functionality for the user.
+
 import sys, pygame
 pygame.init()
 

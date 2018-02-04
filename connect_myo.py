@@ -1,4 +1,4 @@
-# Qwer.py
+# Connect_myo.py
 # Purpose: This file provides the functionality to interact with the Myo and calculate the direction that the user is
 # pointing in. Includes various testing bits. As of 8:11pm Feb. 3, there are two functions
 
@@ -9,7 +9,8 @@ from myo import init, Hub, Feed
 # Advanced mathematical calculations required for quaternion vectors
 import math
 
-def get_angle():
+
+def calculate_yaw_from_myo():
     # Purpose: returns the measurement of yaw from myo. This measurement is used as the direction of movement of
     # the player in movement.py
 
@@ -45,7 +46,7 @@ def get_angle():
     return yaw
 
 
-def stahp():
+def close_connection_to_myo():
     # Purpose: closes the connection to the Myo. From the documentation: "Free all resources associated with this Hub.
     # Will disconnect all connected Myo devices. After shutting down, init must be called before using the Hub again."
     hub.shutdown()  # !! crucial.

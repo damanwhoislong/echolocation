@@ -1,3 +1,6 @@
+# Movement.py
+# Purpose: Provides movement functionality for the user.
+
 '''
 ingameMusic = pygame.mixer.Sound('sounds/background music.wav')
 pygame.mixer.set_num_channels(10)
@@ -5,13 +8,15 @@ channel0 = pygame.mixer.Channel(0)
 channel0.play(ingameMusic, loops=-1)
 '''
 
+import math
 import maze
 import pygame
-import time
-import sys
 import random
-import math
-import qwer
+import sys
+import time
+
+
+import connect_myo
 
 
 def move_player(buttons, p_spd, ang, walls, siz):
@@ -68,7 +73,7 @@ moveSpeed = 1.0 / 60  # grid tiles per second / 60 frames per second
 
 while True:
     # get da angle
-    angle = qwer.get_angle()
+    angle = connect_myo.calculate_yaw_from_myo()
 
     pygame.draw.circle(screen, (255, 0, 0), (int(posY * (500/maze.size)), int(posX * (500/maze.size))), 4)
 
@@ -100,7 +105,7 @@ while True:
     clock.tick(60)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            qwer.stahp()
+            connect_myo.close_connection_to_myo()
             sys.exit()
 
 
