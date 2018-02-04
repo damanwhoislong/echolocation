@@ -91,8 +91,11 @@ feed = MyFeed()
 hub = libmyo.Hub()
 hub.set_locking_policy(libmyo.LockingPolicy.none)
 hub.run(1000, feed)
-print("Hello, Myo!")
+# print("Hello, Myo!")
 myo = feed.wait_for_single_device(timeout=5.0)
+if myo is None:
+    print("Myo is not connected")
+    exit()
 
 sonarActivated = False
 
