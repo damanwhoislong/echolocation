@@ -34,7 +34,7 @@ pygame.font.init()
 time.sleep(1)
 
 # setup the screen and main clock
-screen = pygame.display.set_mode((400, 400))
+screen = pygame.display.set_mode((500, 500))
 pygame.display.set_caption("your title here")
 clock = pygame.time.Clock()
 
@@ -65,7 +65,7 @@ while True:
     # get da angle
     angle = qwer.get_angle()
 
-    pygame.draw.circle(screen, (255, 0, 0), (int(posY * 40), int(posX * 40)), 4)
+    pygame.draw.circle(screen, (255, 0, 0), (int(posY * (500/maze.size)), int(posX * (500/maze.size))), 4)
 
     # moving
     pressed = pygame.key.get_pressed()
@@ -85,7 +85,7 @@ while True:
             moveSound3.play()
         if num == 4:
             moveSound4.play()
-        stepDelay = 30
+        stepDelay = 20
 
     # hit boxes
     if posToGrid == [8, 9]:
