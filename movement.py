@@ -20,7 +20,7 @@ import connect_myo
 
 
 def move_player(buttons, p_spd, ang, walls, siz):
-    global posX, posY, stepDelay
+    global posX, posY, stepDelay, angle, initial_calibration
 
     velX = math.cos(ang * 1) / 60
     velY = math.sin(ang * 1) / 60
@@ -37,9 +37,44 @@ def move_player(buttons, p_spd, ang, walls, siz):
         fullDiagonal = math.sqrt((siz)**2 + siz**2)
         curDiagonal = math.sqrt((siz-posX)**2 + ((siz-1)-posY)**2)
         minDistFinishRatio = curDiagonal/fullDiagonal
-        music.set_volume((1.1 - minDistFinishRatio) / 3.5)
+        avg_loudness = (1.1 - minDistFinishRatio) / 3.5
+
+        Ux = posY
+        Dx = siz - 2
+        Uy = siz - posX
+        Dy = 2
+        Uangle = angle * 180 / math.pi - 90
+
+        dest_bearing = math.atan((Dy - Uy) / (Dx - Ux)) * 180 / math.pi
+        print(Ux, Dx, Uy, Dy, dest_bearing, angle * 180 / math.pi)
+
         stepDelay += -1
 
+
+def do_music(siz):
+    fullDiagonal = math.sqrt((siz) ** 2 + siz ** 2)
+    curDiagonal = math.sqrt((siz - posX) ** 2 + ((siz - 1) - posY) ** 2)
+    minDistFinishRatio = curDiagonal / fullDiagonal
+    # avg_loudness = (1.1 - minDistFinishRatio) / 1
+    avg_loudness = -0.49 * minDistFinishRatio + 0.5
+    # avg_loudness = 0.25 / (10 * minDistFinishRatio + 0.5)
+    Ux = posY
+    Dx = siz - 2
+    Uy = siz - posX
+    Dy = 2
+    Uangle = angle * 180 / math.pi - 90
+
+    dest_bearing = math.atan((Dy - Uy) / (Dx - Ux)) * 180 / math.pi
+
+    theta = Uangle - dest_bearing
+
+    vol_left = - avg_loudness * math.sin(math.pi / 180 * theta) + avg_loudness
+    vol_right = avg_loudness * math.sin(math.pi / 180 * theta) + avg_loudness
+
+    print(theta, avg_loudness, vol_left, vol_right)
+
+    music_ch1.set_volume(vol_left, 0)
+    music_ch2.set_volume(0, vol_right)
 
 # set up pygame
 pygame.mixer.pre_init(22050, -16, 4, 512)
@@ -55,7 +90,7 @@ clock = pygame.time.Clock()
 
 # sounds
 music = pygame.mixer.Sound("sounds/looping_radio_mix.wav")
-music.play(loops=-1)
+# music.play(loops=-1)
 moveSound1 = pygame.mixer.Sound("sounds/step1.wav")
 moveSound2 = pygame.mixer.Sound("sounds/step2.wav")
 moveSound3 = pygame.mixer.Sound("sounds/step3.wav")
@@ -63,10 +98,14 @@ moveSound4 = pygame.mixer.Sound("sounds/step4.wav")
 
 channel1 = pygame.mixer.Channel(1)
 channel2 = pygame.mixer.Channel(2)
+music_ch1 = pygame.mixer.Channel(3)
+music_ch2 = pygame.mixer.Channel(4)
+music_ch1.play(music, loops=-1)
+music_ch2.play(music, loops=-1)
 
 stepDelay = 30
 
-music.set_volume(0.01)
+# music.set_volume(0.01)
 
 # the pings
 pingDelay = 0
@@ -166,7 +205,8 @@ while True:
         if num == 4:
             moveSound4.play()
         stepDelay = 20
-
+    # play music
+    do_music(maze.size)
     # hit boxes
     if posToGrid == [8, 9]:
         print("YOU WIN")
