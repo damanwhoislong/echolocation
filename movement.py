@@ -14,8 +14,6 @@ import pygame
 import random
 import sys
 import time
-
-
 import connect_myo
 
 
@@ -50,7 +48,7 @@ def move_player(buttons, p_spd, ang, walls, siz):
         dest_bearing = math.atan((Dy - Uy) / (Dx - Ux)) * 180 / math.pi
         # print(Ux, Dx, Uy, Dy, dest_bearing, angle * 180 / math.pi)
 
-        stepDelay += -1
+        stepDelay -= 1
 
 
 def do_music(siz):
@@ -112,8 +110,9 @@ def update_echo(x, y, loudness, siz):
     ping_ch2.set_volume(0.0, vol_right)
 
 
+
 # set up pygame
-pygame.mixer.pre_init(22050, -16, 2, 512)
+pygame.mixer.pre_init(22050, -16, 2, 256)
 pygame.mixer.init()
 pygame.mixer.set_num_channels(12)
 pygame.mixer.set_reserved(6)
@@ -164,15 +163,6 @@ frames = 0
 posX = 1.0
 posY = 0.0
 
-initial_calibration = connect_myo.calculate_yaw_from_myo() - (math.pi / 2)
-
-# coordinates of the walls
-wallList = []
-for i in range(len(maze.grid)):
-    for j in range(len(maze.grid[i])):
-        if maze.grid[i][j] == "W":
-            wallList.append([i, j])
-
 # stats
 moveSpeed = 1.0 / 60  # grid tiles per second / 60 frames per second
 
@@ -190,120 +180,143 @@ realPingX = realPingY = 0
 
 tick = 0
 
-while True:
-    screen.fill([190, 190, 190])
+# get da angle
+initial_calibration = connect_myo.calculate_yaw_from_myo() - (math.pi / 2)
+angle = connect_myo.calculate_yaw_from_myo() - initial_calibration
+wallList = []
 
-    pingDelay += -1
+def run(size, grid):
+    global pingDelay, pingSound, pingX, pingY, pingActive, pingAng, pingVelX, pingVelY, pingPos, frames, posX, posY
+    global moveSpeed, previous, actual, out_ping_active, out_ping_dir, echo_active, sonar_loudness, realPingX, realPingY
+    global tick, stepDelay, angle, initial_calibration, wallList
 
-    # get da angle
-    angle = connect_myo.calculate_yaw_from_myo() - initial_calibration
-    # ping when mouse is pressed and if there are no pings rn
-    mouse = pygame.mouse.get_pressed()
-    if mouse[0] == 1 and pingActive == False and pingDelay <= 0:
-        pingSound.set_volume(1.0)
-        channel1.play(pingSound)
-        channel1.set_volume(0.0)
-        channel2.play(pingSound)
-        channel2.set_volume(0.0)
-        pingX = posX
-        pingY = posY
-        pingAng = angle
-        out_ping_dir = angle * 180 / math.pi - 90
-        pingVelX = math.cos(pingAng) * 3 / 60
-        pingVelY = math.sin(pingAng) * 3 / 60
-        pingActive = True
-        out_ping_active = True
-        pingDelay = 10
-        pingPos = [int(round(pingX)), int(round(pingY))]
+    # coordinates of the walls
 
-    newPingX = newPingY = 0
-    if pingActive:
-        frames += 1
-        pingX += pingVelX
-        pingY += pingVelY
-        newPingX = pingX
-        newPingY = pingY
-        pingPos = [int(round(newPingX)), int(round(newPingY))]
+    for i in range(len(grid)):
+        for j in range(len(grid[i])):
+            if grid[i][j] == "W":
+                wallList.append([i, j])
 
-        if pingPos in wallList or pingPos[0] < 0 or pingPos[0] >= maze.size or pingPos[1] < 0 or pingPos[1] >= maze.size:
-            if (1.1 / (frames / 30)) <= 0.15:
-                sonar_loudness = 0.15
-                # print(0.15)
-            else:
-                sonar_loudness = (1.1 / (frames / 30))
-                # print(1.1 / (frames / 10))
-            ping_ch1.play(pingSound)
-            ping_ch1.set_volume(0.0)
-            ping_ch2.play(pingSound)
-            ping_ch2.set_volume(0.0)
-            sound_active = True
-            frames = 0
-            pingActive = False
 
-    # if connect_myo.sonarActivated:
-    #    print("BEEP")
 
-    for i in range(len(wallList)):
-        pygame.draw.rect(screen, (25, 25, 25), (wallList[i][1] * (500 / maze.size) - (250 / maze.size), (wallList[i][0] - 1) * (500 / maze. size) + (250 / maze.size), 500 / maze.size, 500 / maze.size), 4)
+    while True:
+        screen.fill([190, 190, 190])
+        pingDelay += -1
 
-    pygame.draw.circle(screen, (255, 0, 0), (int(posY * (500/maze.size)), int(posX * (500/maze.size))), 7)
-    pygame.draw.circle(screen, (155, 155, 255), (int(pingY * (500 / maze.size)), int(pingX * (500 / maze.size))), 5)
+        angle = connect_myo.calculate_yaw_from_myo() - initial_calibration
 
-    # moving
-    pressed = pygame.key.get_pressed()
-    if mouse[2]:
-        move_player(pressed, moveSpeed, angle, wallList, maze.size)
-    posToGrid = [int(round(posX)), int(round(posY))]
+        # ping when mouse is pressed and if there are no pings rn
+        mouse = pygame.mouse.get_pressed()
+        if mouse[0] == 1 and pingActive == False and pingDelay <= 0:
+            pingSound.set_volume(1.0)
+            channel1.play(pingSound)
+            channel1.set_volume(0.0)
+            channel2.play(pingSound)
+            channel2.set_volume(0.0)
+            pingX = posX
+            pingY = posY
+            pingAng = angle
+            out_ping_dir = angle * 180 / math.pi - 90
+            pingVelX = math.cos(pingAng) * 3 / 60
+            pingVelY = math.sin(pingAng) * 3 / 60
+            pingActive = True
+            out_ping_active = True
+            pingDelay = 10
+            pingPos = [int(round(pingX)), int(round(pingY))]
 
-    if mouse[1]:  # recalibrate using middle mouse click
-        initial_calibration = connect_myo.calculate_yaw_from_myo() - (math.pi / 2)
+        newPingX = newPingY = 0
+        if pingActive:
+            frames += 1
+            pingX += pingVelX
+            pingY += pingVelY
+            newPingX = pingX
+            newPingY = pingY
+            pingPos = [int(round(newPingX)), int(round(newPingY))]
 
-    # play the movement sound
-    if stepDelay <= 0:
-        num = random.randint(1,4)
-        if num == 1:
-            moveSound1.play()
-        if num == 2:
-            moveSound2.play()
-        if num == 3:
-            moveSound3.play()
-        if num == 4:
-            moveSound4.play()
-        stepDelay = 20
-    # play music
-    do_music(maze.size)
-    # update sonar sounds
-    if channel1.get_busy():
-        update_out_ping(out_ping_dir, maze.size)
-    if ping_ch1.get_busy() or ping_ch2.get_busy():
-        if newPingX != 0 and newPingY != 0:
-            realPingX = newPingX
-            realPingY = newPingY
-        update_echo(realPingY, maze.size - realPingX, sonar_loudness, maze.size)
-    # hit boxes
-    if posToGrid == [8, 9]:
-        print("YOU WIN")
-        finishMusic.play()
-    pressed = pygame.key.get_pressed()
-    if pressed[pygame.K_SPACE]:
-        if not previous:
-            actual = not actual
-        previous = True
-    else:
-        previous = False
+            if pingPos in wallList or pingPos[0] < 0 or pingPos[0] >= size or pingPos[1] < 0 or pingPos[1] >= size:
+                if (1.1 / (frames / 30)) <= 0.15:
+                    sonar_loudness = 0.15
+                    # print(0.15)
+                else:
+                    sonar_loudness = (1.1 / (frames / 30))
+                    # print(1.1 / (frames / 10))
+                ping_ch1.play(pingSound)
+                ping_ch1.set_volume(0.0)
+                ping_ch2.play(pingSound)
+                ping_ch2.set_volume(0.0)
+                sound_active = True
+                frames = 0
+                pingActive = False
 
-    if actual:
-        screen.fill([0, 0, 0])
+        # if connect_myo.sonarActivated:
+        #    print("BEEP")
 
-    pygame.display.update()
-    clock.tick(60)
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT or pressed[pygame.K_ESCAPE]:
-            connect_myo.close_connection_to_myo()
-            sys.exit()
+        for i in range(len(wallList)):
+            pygame.draw.rect(screen, (25, 25, 25), (wallList[i][1] * (500 / size) - (250 / size), (wallList[i][0] - 1) * \
+                                                    (500 / size) + (250 / size), 500 / size, 500 / size), 4)
 
-    # if tick == 59:
-    #     tick = 0
-    # else:
-    #     tick += 1
+        pygame.draw.circle(screen, (255, 0, 0), (int(posY * (500/size)), int(posX * (500/size))), 7)
+        pygame.draw.circle(screen, (155, 155, 255), (int(pingY * (500 / size)), int(pingX * (500 / size))), 5)
+
+        # moving
+        pressed = pygame.key.get_pressed()
+        if mouse[2]:
+            move_player(pressed, moveSpeed, angle, wallList, size)
+        posToGrid = [int(round(posX)), int(round(posY))]
+
+        if mouse[1]:  # recalibrate using middle mouse click
+            initial_calibration = connect_myo.calculate_yaw_from_myo() - (math.pi / 2)
+
+        # play the movement sound
+        if stepDelay <= 0:
+            num = random.randint(1,4)
+            if num == 1:
+                moveSound1.play()
+            if num == 2:
+                moveSound2.play()
+            if num == 3:
+                moveSound3.play()
+            if num == 4:
+                moveSound4.play()
+            stepDelay = 30
+        # play music
+        do_music(size)
+        # update sonar sounds
+        if channel1.get_busy():
+            update_out_ping(out_ping_dir, size)
+        if ping_ch1.get_busy() or ping_ch2.get_busy():
+            if newPingX != 0 and newPingY != 0:
+                realPingX = newPingX
+                realPingY = newPingY
+            update_echo(realPingY, size - realPingX, sonar_loudness, size)
+        # hit boxes
+        if posToGrid == [size - 2, size - 1]:
+            if music_ch1.get_busy() and music_ch2.get_busy():
+                music_ch1.stop()
+                music_ch2.stop()
+                music_ch1.set_volume(1)
+                music_ch1.play(finishMusic)
+
+        pressed = pygame.key.get_pressed()
+        if pressed[pygame.K_SPACE]:
+            if not previous:
+                actual = not actual
+            previous = True
+        else:
+            previous = False
+
+        if actual:
+            screen.fill([0, 0, 0])
+
+        pygame.display.update()
+        clock.tick(60)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT or pressed[pygame.K_ESCAPE]:
+                connect_myo.close_connection_to_myo()
+                sys.exit()
+
+        # if tick == 59:
+        #     tick = 0
+        # else:
+        #     tick += 1
 

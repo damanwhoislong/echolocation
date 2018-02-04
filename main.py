@@ -2,7 +2,7 @@ import pygame
 import time
 import random
 
-
+size = 1
 
 def game_intro():
     pygame.init()
@@ -24,9 +24,23 @@ def game_intro():
         clock.tick(60)
         pygame.display.update()
 
+        levelSelect = pygame.key.get_pressed()
         for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONUP:
+            if event.type == pygame.KEYDOWN:
+                levelSelect = pygame.key.get_pressed()
+                if levelSelect[pygame.K_2]:
+                    size = 10
+                elif levelSelect[pygame.K_3]:
+                    size = 15
+                elif levelSelect[pygame.K_4]:
+                    size = 20
+                else:
+                    size = 6
+                print(size)
+                # GENERATE MAZE
+                import maze
                 import movement
+                movement.run(size, maze.create_maze(size))
 
     pygame.quit()
 
