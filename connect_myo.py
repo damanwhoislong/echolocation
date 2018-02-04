@@ -4,10 +4,35 @@
 
 
 # Import the needed items from Myo
-from myo import init, Hub, Feed
+import myo as libmyo
+
 
 # Advanced mathematical calculations required for quaternion vectors
 import math
+
+class MyFeed(libmyo.Feed):
+
+    def __init__(self):
+        super(MyFeed, self).__init__()
+        self.orientation = None
+        self.pose = libmyo.Pose.rest
+        self.locked = False
+
+    def on_pose(self,myo,timestamp,pose):
+        self.pose = pose
+        self.handler(pose=pose)
+
+    def on_orientation_data(self,myo,timestamp,orientation):
+        self.orientation = orientation
+        self.handler(orientation=orientation)
+
+    def handler(self,pose=None,orientation=None):
+        global is_fist, is_in
+        is_fist = is_in = False
+        if pose == libmyo.Pose.fist:
+            is_fist = True
+        elif pose == libmyo.Pose.wave_in:
+            is_in = True
 
 
 def calculate_yaw_from_myo():
@@ -17,9 +42,9 @@ def calculate_yaw_from_myo():
     # Why do we need a global variable?
     global myo, sonarActivated, feed
 
-    if not myo:
-        # When no Myo connects, say so
-        print("No Myo connected after 2 seconds")
+    # if not myo:
+    #     # When no Myo connects, say so
+    #     print("No Myo connected after 2 seconds")
 
     # Get the quaternion vectors from the connected Myo
     quat = myo.orientation
@@ -42,16 +67,15 @@ def calculate_yaw_from_myo():
     # "Pitch:", pitch*180/3.14159265358979323846264338327950288, "Roll:", roll*180/3.14159265358979323846264338327950288)
 
     # look for double tap
-    #if feed.on_event(kind=myo.pose, event=libmyo.Pose.fist):
+    #if feed.on_event(kind=myo.pose, event=myo.Pose.fist):
         #sonarActivated = True
-    '''
-    if feed.on_pose(myo, 1234, myo._pose.double_tap):
-        sonarActivated = True
-        print("beep in connect")
-    elif not feed.on_pose(myo, 1234, myo._pose.double_tap):
-        sonarActivated = False
-        print(naw)
-    '''
+
+    # if feed.on_pose(myo, 0, myo._pose.fist):
+    #     sonarActivated = True
+    #     print("beep in connect")
+    # else:
+    #     sonarActivated = False
+
     # Pass the value of yaw to the caller
     return yaw
 
@@ -62,11 +86,18 @@ def close_connection_to_myo():
     hub.shutdown()  # !! crucial.
 
 
-init()
-feed = Feed()
-hub = Hub()
+libmyo.init()
+feed = MyFeed()
+hub = libmyo.Hub()
+hub.set_locking_policy(libmyo.LockingPolicy.none)
 hub.run(1000, feed)
 print("Hello, Myo!")
-myo = feed.wait_for_single_device(timeout=2.0)
+myo = feed.wait_for_single_device(timeout=5.0)
+
 sonarActivated = False
+
+# some global variables
+is_fist = False
+is_in = False
+
 calculate_yaw_from_myo()
