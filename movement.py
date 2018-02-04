@@ -84,8 +84,6 @@ while True:
     move_player(pressed, moveSpeed, angle, wallList, maze.size)
     posToGrid = [int(round(posX)), int(round(posY))]
 
-    print(posToGrid)
-
     # play the movement sound
     if stepDelay <= 0:
         num = random.randint(1,4)

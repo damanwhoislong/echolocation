@@ -37,7 +37,6 @@ def calculate_yaw_from_myo():
 
     # Calculate the yaw, and print to console
     yaw = math.atan2(2.0 * (quat.x * quat.y + quat.w * quat.z), quat.w * quat.w + quat.x * quat.x - quat.y * quat.y - quat.z * quat.z)
-    print("Yaw:", yaw*180/3.14159265358979323846264338327950288)
 
     # Testing for printing the other irrelevant information
     # "Pitch:", pitch*180/3.14159265358979323846264338327950288, "Roll:", roll*180/3.14159265358979323846264338327950288)
@@ -46,8 +45,9 @@ def calculate_yaw_from_myo():
     #if feed.on_event(kind=myo.pose, event=libmyo.Pose.fist):
         #sonarActivated = True
 
-    if feed.on_pose(myo, 1234, myo._pose.fist):
+    if feed.on_pose(myo, 1234, myo._pose.double_tap):
         sonarActivated = True
+        print("beep in connect")
     else:
         sonarActivated = False
 
