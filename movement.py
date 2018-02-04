@@ -135,6 +135,10 @@ for i in range(len(maze.grid)):
 # stats
 moveSpeed = 1.0 / 60  # grid tiles per second / 60 frames per second
 
+# toggle
+toggle = True
+previous = False
+
 while True:
     screen.fill([190, 190, 190])
 
@@ -210,6 +214,18 @@ while True:
     # hit boxes
     if posToGrid == [8, 9]:
         print("YOU WIN")
+    pressed = pygame.key.get_pressed()
+    if pressed[pygame.K_SPACE]:
+        if previous == False:
+            toggle = True
+        previous = True
+    else:
+        if previous == True:
+            toggle = False
+        previous = False
+
+    if toggle:
+        screen.fill(0,0,0)
 
     pygame.display.update()
     clock.tick(60)
