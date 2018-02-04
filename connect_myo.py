@@ -15,7 +15,7 @@ def calculate_yaw_from_myo():
     # the player in movement.py
 
     # Why do we need a global variable?
-    global myo
+    global myo, sonarActivated, feed
 
     if not myo:
         # When no Myo connects, say so
@@ -42,6 +42,15 @@ def calculate_yaw_from_myo():
     # Testing for printing the other irrelevant information
     # "Pitch:", pitch*180/3.14159265358979323846264338327950288, "Roll:", roll*180/3.14159265358979323846264338327950288)
 
+    # look for double tap
+    #if feed.on_event(kind=myo.pose, event=libmyo.Pose.fist):
+        #sonarActivated = True
+
+    if feed.on_pose(myo, 1234, myo._pose.fist):
+        sonarActivated = True
+    else:
+        sonarActivated = False
+
     # Pass the value of yaw to the caller
     return yaw
 
@@ -58,3 +67,5 @@ hub = Hub()
 hub.run(1000, feed)
 print("Hello, Myo!")
 myo = feed.wait_for_single_device(timeout=2.0)
+sonarActivated = False
+calculate_yaw_from_myo()

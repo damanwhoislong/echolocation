@@ -74,6 +74,8 @@ moveSpeed = 1.0 / 60  # grid tiles per second / 60 frames per second
 while True:
     # get da angle
     angle = connect_myo.calculate_yaw_from_myo()
+    if connect_myo.sonarActivated:
+        print("BEEP")
 
     pygame.draw.circle(screen, (255, 0, 0), (int(posY * (500/maze.size)), int(posX * (500/maze.size))), 4)
 
@@ -109,6 +111,4 @@ while True:
             sys.exit()
 
 
-
-qwer.stahp()
 
