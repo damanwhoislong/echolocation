@@ -20,7 +20,13 @@ def game_intro():
         titleText = titleFont.render("P  i  !  N  G", True, (255, 255, 255))  # colour and the text that it displays
         text_rect = titleText.get_rect(center=(500 / 2, 500 / 2))  # centers the text
 
+        levelFont = pygame.font.SysFont('Courier New', 20)  # font size and stuff
+        levelText = levelFont.render("Press 1-4 to select level", True, (255, 255, 255))  # colour and the text that it displays
+        text_rect2 = levelText.get_rect(center=(500 / 2, 200 + 500 / 2))  # centers the text
+
+
         screen.blit(titleText, text_rect)
+        screen.blit(levelText, text_rect2)
         clock.tick(60)
         pygame.display.update()
 
