@@ -1,3 +1,10 @@
+'''
+ingameMusic = pygame.mixer.Sound('sounds/background music.wav')
+pygame.mixer.set_num_channels(10)
+channel0 = pygame.mixer.Channel(0)
+channel0.play(ingameMusic, loops=-1)
+'''
+
 import maze
 import pygame
 import time
@@ -9,7 +16,6 @@ import qwer
 
 def move_player(buttons, p_spd, ang, walls, siz):
     global posX, posY, stepDelay
-    direction = [0, 0]  # y, x
 
     velX = math.cos(ang * 1) / 60
     velY = math.sin(ang * 1) / 60
@@ -57,7 +63,6 @@ for i in range(len(maze.grid)):
         if maze.grid[i][j] == "W":
             wallList.append([i, j])
 
-print(wallList)
 # stats
 moveSpeed = 1.0 / 60  # grid tiles per second / 60 frames per second
 
