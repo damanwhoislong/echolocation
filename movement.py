@@ -37,8 +37,7 @@ def move_player(buttons, p_spd, ang, walls, siz):
         fullDiagonal = math.sqrt((siz)**2 + siz**2)
         curDiagonal = math.sqrt((siz-posX)**2 + ((siz-1)-posY)**2)
         minDistFinishRatio = curDiagonal/fullDiagonal
-
-        music.set_volume((1.05 - minDistFinishRatio) / 4)
+        music.set_volume((1.1 - minDistFinishRatio) / 3.5)
 
 
     stepDelay += -1
@@ -69,6 +68,8 @@ channel2 = pygame.mixer.Channel(2)
 
 stepDelay = 30
 
+music.set_volume(0.01)
+
 # the pings
 pingDelay = 0
 pingSound = pygame.mixer.Sound("sounds/ping1_best.wav")
@@ -85,6 +86,8 @@ frames = 0
 posX = 1.0
 posY = 0.0
 
+initial_calibration = connect_myo.calculate_yaw_from_myo() - (math.pi / 2)
+
 # coordinates of the walls
 wallList = []
 for i in range(len(maze.grid)):
@@ -96,10 +99,12 @@ for i in range(len(maze.grid)):
 moveSpeed = 1.0 / 60  # grid tiles per second / 60 frames per second
 
 while True:
+    screen.fill([190, 190, 190])
+
     pingDelay += -1
 
     # get da angle
-    angle = connect_myo.calculate_yaw_from_myo()
+    angle = connect_myo.calculate_yaw_from_myo() - initial_calibration
     # ping when mouse is pressed and if there are no pings rn
     mouse = pygame.mouse.get_pressed()
     if mouse[0] == 1 and pingActive == False and pingDelay <= 0:
@@ -123,11 +128,11 @@ while True:
         pingPos = [int(round(newPingX)), int(round(newPingY))]
 
         if pingPos in wallList or pingPos[0] < 0 or pingPos[0] >= maze.size or pingPos[1] < 0 or pingPos[1] >= maze.size:
-            if (1.1 / (frames / 10)) <= 0.15:
+            if (1.1 / (frames / 30)) <= 0.15:
                 pingSound.set_volume(0.15)
                 print(0.15)
             else:
-                pingSound.set_volume(math.sqrt(1.1 / (frames / 10)))
+                pingSound.set_volume((1.1 / (frames / 30)))
                 print(1.1 / (frames / 10))
             channel2.play(pingSound)
             frames = 0
@@ -136,13 +141,20 @@ while True:
     #if connect_myo.sonarActivated:
     #    print("BEEP")
 
-    pygame.draw.circle(screen, (255, 0, 0), (int(posY * (500/maze.size)), int(posX * (500/maze.size))), 4)
-    pygame.draw.circle(screen, (155, 155, 255), (int(pingY * (500 / maze.size)), int(pingX * (500 / maze.size))), 4)
+    for i in range(len(wallList)):
+        pygame.draw.rect(screen, (25, 25, 25), (wallList[i][1] * (500 / maze.size) - (250 / maze.size), (wallList[i][0] - 1) * (500 / maze. size) + (250 / maze.size), 500 / maze.size, 500 / maze.size), 4)
+
+    pygame.draw.circle(screen, (255, 0, 0), (int(posY * (500/maze.size)), int(posX * (500/maze.size))), 7)
+    pygame.draw.circle(screen, (155, 155, 255), (int(pingY * (500 / maze.size)), int(pingX * (500 / maze.size))), 5)
 
     # moving
     pressed = pygame.key.get_pressed()
-    move_player(pressed, moveSpeed, angle, wallList, maze.size)
+    if mouse[2] == True:
+        move_player(pressed, moveSpeed, angle, wallList, maze.size)
     posToGrid = [int(round(posX)), int(round(posY))]
+
+    if mouse[1] == True:  # recalibrate using middle mouse click
+        initial_calibration = connect_myo.calculate_yaw_from_myo() - (math.pi / 2)
 
     # play the movement sound
     if stepDelay <= 0:
