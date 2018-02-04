@@ -90,6 +90,7 @@ clock = pygame.time.Clock()
 
 # sounds
 music = pygame.mixer.Sound("sounds/looping_radio_mix.wav")
+finishMusic = pygame.mixer.Sound("sounds/Splashing_Around.wav")
 # music.play(loops=-1)
 moveSound1 = pygame.mixer.Sound("sounds/step1.wav")
 moveSound2 = pygame.mixer.Sound("sounds/step2.wav")
@@ -214,6 +215,7 @@ while True:
     # hit boxes
     if posToGrid == [8, 9]:
         print("YOU WIN")
+        finishMusic.play()
     pressed = pygame.key.get_pressed()
     if pressed[pygame.K_SPACE]:
         if previous == False:
@@ -225,7 +227,7 @@ while True:
         previous = False
 
     if toggle:
-        screen.fill(0,0,0)
+        screen.fill([0,0,0])
 
     pygame.display.update()
     clock.tick(60)
