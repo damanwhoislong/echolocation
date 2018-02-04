@@ -7,36 +7,23 @@ import math
 import qwer
 
 
-def move_player(buttons, p_spd, ang):
+def move_player(buttons, p_spd, ang, walls, siz):
     global posX, posY, stepDelay
     direction = [0, 0]  # y, x
 
-    velX = math.cos(ang * 1)
-    velY = math.sin(ang * 1)
+    velX = math.cos(ang * 1) / 60
+    velY = math.sin(ang * 1) / 60
 
-    posX += velX
-    posY += velY
+    newX = posX + velX
+    newY = posY + velY
+    grid_position = [int(round(newX)), int(round(newY))]
+    if grid_position in wallList or grid_position[0] < 0 or grid_position[0] >= siz or grid_position[1] < 0 or grid_position[1] >= siz:
+        pass
+    else:
+        posX += velX
+        posY += velY
 
     stepDelay += -1
-    '''
-    # redoing dis shit, num[0] = x movement, num[1] = y movement
-    if buttons[pygame.K_w]:  # go up (decreases X)
-        direction[1] = - p_spd
-    elif buttons[pygame.K_s]:  # go down (increases X)
-        direction[1] = p_spd
-    if buttons[pygame.K_d]:  # go right (increases Y)
-        direction[0] = p_spd
-    elif buttons[pygame.K_a]:  # go left (decreases Y)
-        direction[0] = - p_spd
-
-    # move da player
-    if direction[0] and direction[1] != 0:
-        posX += direction[1] * 0.7
-        posY += direction[0] * 0.7
-    else:
-        posX += direction[1]
-        posY += direction[0]
-    '''
 
 
 # set up pygame
@@ -47,7 +34,7 @@ pygame.font.init()
 time.sleep(1)
 
 # setup the screen and main clock
-screen = pygame.display.set_mode((200, 200))
+screen = pygame.display.set_mode((400, 400))
 pygame.display.set_caption("your title here")
 clock = pygame.time.Clock()
 
@@ -78,9 +65,11 @@ while True:
     # get da angle
     angle = qwer.get_angle()
 
+    pygame.draw.circle(screen, (255, 0, 0), (int(posY * 40), int(posX * 40)), 4)
+
     # moving
     pressed = pygame.key.get_pressed()
-    move_player(pressed, moveSpeed, angle)
+    move_player(pressed, moveSpeed, angle, wallList, maze.size)
     posToGrid = [int(round(posX)), int(round(posY))]
 
     print(posToGrid)
@@ -99,12 +88,17 @@ while True:
         stepDelay = 30
 
     # hit boxes
-    if posToGrid in wallList:
-        print("HITTING WALL")
+    if posToGrid == [8, 9]:
+        print("YOU WIN")
 
+    pygame.display.update()
     clock.tick(60)
     for event in pygame.event.get():
-        if event.type == pygame.QUIT: sys.exit()
+        if event.type == pygame.QUIT:
+            qwer.stahp()
+            sys.exit()
 
 
+
+qwer.stahp()
 
