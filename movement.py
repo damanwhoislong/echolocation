@@ -38,7 +38,7 @@ def move_player(buttons, p_spd, ang, walls, siz):
         curDiagonal = math.sqrt((siz-posX)**2 + ((siz-1)-posY)**2)
         minDistFinishRatio = curDiagonal/fullDiagonal
 
-        music.set_volume((1-minDistFinishRatio)/2)
+        music.set_volume((1.05 - minDistFinishRatio) / 4)
 
 
     stepDelay += -1
@@ -64,7 +64,22 @@ moveSound2 = pygame.mixer.Sound("sounds/step2.wav")
 moveSound3 = pygame.mixer.Sound("sounds/step3.wav")
 moveSound4 = pygame.mixer.Sound("sounds/step4.wav")
 
+channel1 = pygame.mixer.Channel(1)
+channel2 = pygame.mixer.Channel(2)
+
 stepDelay = 30
+
+# the pings
+pingDelay = 0
+pingSound = pygame.mixer.Sound("sounds/ping1_best.wav")
+pingX = -5
+pingY = -5
+pingActive = False
+pingAng = 0
+pingVelX = 0
+pingVelY = 0
+pingPos = [-5, -5]
+frames = 0
 
 # position X AND Y ARE SWAPPED KINDA
 posX = 1.0
@@ -81,12 +96,48 @@ for i in range(len(maze.grid)):
 moveSpeed = 1.0 / 60  # grid tiles per second / 60 frames per second
 
 while True:
+    pingDelay += -1
+
     # get da angle
     angle = connect_myo.calculate_yaw_from_myo()
-    if connect_myo.sonarActivated:
-        print("BEEP")
+    # ping when mouse is pressed and if there are no pings rn
+    mouse = pygame.mouse.get_pressed()
+    if mouse[0] == 1 and pingActive == False and pingDelay <= 0:
+        pingSound.set_volume(1.5)
+        channel1.play(pingSound)
+        pingX = posX
+        pingY = posY
+        pingAng = angle
+        pingVelX = math.cos(pingAng) * 3 / 60
+        pingVelY = math.sin(pingAng) * 3 / 60
+        pingActive = True
+        pingDelay = 10
+        pingPos = [int(round(pingX)), int(round(pingY))]
+
+    if pingActive:
+        frames += 1
+        pingX += pingVelX
+        pingY += pingVelY
+        newPingX = pingX
+        newPingY = pingY
+        pingPos = [int(round(newPingX)), int(round(newPingY))]
+
+        if pingPos in wallList or pingPos[0] < 0 or pingPos[0] >= maze.size or pingPos[1] < 0 or pingPos[1] >= maze.size:
+            if (1.1 / (frames / 10)) <= 0.15:
+                pingSound.set_volume(0.15)
+                print(0.15)
+            else:
+                pingSound.set_volume(math.sqrt(1.1 / (frames / 10)))
+                print(1.1 / (frames / 10))
+            channel2.play(pingSound)
+            frames = 0
+            pingActive = False
+
+    #if connect_myo.sonarActivated:
+    #    print("BEEP")
 
     pygame.draw.circle(screen, (255, 0, 0), (int(posY * (500/maze.size)), int(posX * (500/maze.size))), 4)
+    pygame.draw.circle(screen, (155, 155, 255), (int(pingY * (500 / maze.size)), int(pingX * (500 / maze.size))), 4)
 
     # moving
     pressed = pygame.key.get_pressed()

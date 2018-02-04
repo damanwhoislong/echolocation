@@ -44,13 +44,14 @@ def calculate_yaw_from_myo():
     # look for double tap
     #if feed.on_event(kind=myo.pose, event=libmyo.Pose.fist):
         #sonarActivated = True
-
+    '''
     if feed.on_pose(myo, 1234, myo._pose.double_tap):
         sonarActivated = True
         print("beep in connect")
-    else:
+    elif not feed.on_pose(myo, 1234, myo._pose.double_tap):
         sonarActivated = False
-
+        print(naw)
+    '''
     # Pass the value of yaw to the caller
     return yaw
 
