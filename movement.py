@@ -34,6 +34,13 @@ def move_player(buttons, p_spd, ang, walls, siz):
         posX += velX
         posY += velY
 
+        fullDiagonal = math.sqrt((siz)**2 + siz**2)
+        curDiagonal = math.sqrt((siz-posX)**2 + ((siz-1)-posY)**2)
+        minDistFinishRatio = curDiagonal/fullDiagonal
+
+        music.set_volume((1-minDistFinishRatio)/2)
+
+
     stepDelay += -1
 
 
@@ -50,6 +57,8 @@ pygame.display.set_caption("your title here")
 clock = pygame.time.Clock()
 
 # sounds
+music = pygame.mixer.Sound("sounds/looping_radio_mix.wav")
+music.play(loops=-1)
 moveSound1 = pygame.mixer.Sound("sounds/step1.wav")
 moveSound2 = pygame.mixer.Sound("sounds/step2.wav")
 moveSound3 = pygame.mixer.Sound("sounds/step3.wav")
