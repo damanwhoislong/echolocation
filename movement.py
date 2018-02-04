@@ -113,7 +113,7 @@ def update_echo(x, y, loudness, siz):
 
 
 # set up pygame
-pygame.mixer.pre_init(22050, -16, 2, 2048)
+pygame.mixer.pre_init(22050, -16, 2, 512)
 pygame.mixer.init()
 pygame.mixer.set_num_channels(12)
 pygame.mixer.set_reserved(6)
@@ -298,7 +298,7 @@ while True:
     pygame.display.update()
     clock.tick(60)
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        if event.type == pygame.QUIT or pressed[pygame.K_ESCAPE]:
             connect_myo.close_connection_to_myo()
             sys.exit()
 
