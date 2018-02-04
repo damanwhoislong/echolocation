@@ -38,9 +38,7 @@ def move_player(buttons, p_spd, ang, walls, siz):
         curDiagonal = math.sqrt((siz-posX)**2 + ((siz-1)-posY)**2)
         minDistFinishRatio = curDiagonal/fullDiagonal
         music.set_volume((1.1 - minDistFinishRatio) / 3.5)
-
-
-    stepDelay += -1
+        stepDelay += -1
 
 
 # set up pygame
